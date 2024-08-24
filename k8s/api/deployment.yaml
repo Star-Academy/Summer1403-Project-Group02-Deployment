@@ -18,10 +18,11 @@ spec:
       imagePullSecrets:
         - name: ghcr-registry-secret
 
-      containers:
-        - name: codestar-api
+      initContainers:
+        - name: codestar-api-migrate
           image: ghcr.io/star-academy/summer1403-project-group02-backend:0.4.0
           imagePullPolicy: Always
+          args: ["migrate"]
           env:
             - name: ASPNETCORE_ENVIRONMENT
               valueFrom:
@@ -29,7 +30,29 @@ spec:
                   name: codestar-api-config
                   key: asp-environment
 
-            # - name: ConnectionStrings__DefaultConnection
+            - name: CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: codestar-api-secret
+                  key: default-conn-str
+
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "128m"
+
+      containers:
+        - name: codestar-api
+          image: ghcr.io/star-academy/summer1403-project-group02-backend:0.4.0
+          imagePullPolicy: Always
+          args: ["run"]
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: codestar-api-config
+                  key: asp-environment
+
             - name: CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
