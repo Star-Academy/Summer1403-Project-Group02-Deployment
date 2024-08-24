@@ -1,0 +1,7 @@
+**/node_modules
+**/dist
+
+*secret.yml
+*secret.yaml
+*secrets.yml
+*secrets.yaml
