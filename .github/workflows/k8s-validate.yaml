@@ -5,6 +5,11 @@ on:
       - "k8s/**"
     branches:
       - main
+    types: [opened, synchronize]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
 
 jobs:
   validate:
