@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: codestar-ingress
+  labels:
+    name: codestar-ingress
+spec:
+  rules:
+    - host: codestar-g2.abriment.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: codestar-api
+                port:
+                  name: http-8080
