@@ -1,0 +1,38 @@
+# TODO: Data persistance
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codestar-postgres
+
+spec:
+  selector:
+    matchLabels:
+      app: codestar-postgres
+
+  template:
+    metadata:
+      labels:
+        app: codestar-postgres
+    spec:
+      containers:
+        - name: codestar-postgres
+          image: postgres:16
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: codestar-postgres-secret
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: codestar-postgres-secret
+                  key: password
+
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "128m"
+
+          ports:
+            - containerPort: 5432

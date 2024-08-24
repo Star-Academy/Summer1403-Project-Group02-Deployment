@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: codestar-api
+  labels:
+    app: codestar-api
+
+spec:
+  selector:
+    app: codestar-api
+  ports:
+    - port: 8080
+      targetPort: 8080
