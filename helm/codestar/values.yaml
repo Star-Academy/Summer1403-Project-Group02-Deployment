@@ -7,6 +7,14 @@ api:
       pullPolicy: IfNotPresent
       tag: 0.4.0
 
+    resources:
+      limits:
+        cpu: 256m
+        memory: 256Mi
+      requests:
+        cpu: 128m
+        memory: 128Mi
+
   config:
     name: codestar-api-config
     asp_environment: Development
@@ -14,14 +22,6 @@ api:
   service:
     name: codestar-api
     port: 80
-
-  resources:
-    limits:
-      cpu: 256m
-      memory: 256Mi
-    requests:
-      cpu: 128m
-      memory: 128Mi
 
 ingress:
   ingressClassName: nginx
