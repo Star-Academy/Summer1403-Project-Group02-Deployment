@@ -15,4 +15,4 @@ spec:
               service:
                 name: codestar-api
                 port:
-                  name: http-8080
+                  number: 8080

@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.api.deployment.name }}
+
+spec:
+  replicas: {{ .Values.api.deployment.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.api.deployment.name }}
+
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.api.deployment.name }}
+
+    spec:
+      {{- if .Values.api.pullSecret.enabled }}
+      imagePullSecrets:
+        - name: {{ .Values.api.pullSecret.name }}
+      {{- end }}
+
+      initContainers:
+        - name: {{ .Values.api.deployment.name }}-init
+          image: "{{ .Values.api.deployment.image.name }}:{{ .Values.api.deployment.image.tag }}"
+          imagePullPolicy: {{ .Values.api.deployment.image.pullPolicy }}
+          args: ["migrate"]
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.api.config.name }}
+                  key: asp-environment
+
+            - name: CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.api.secret.name }}
+                  key: conn-str
+
+          resources:
+            {{- toYaml .Values.api.resources | nindent 12 }}
+
+      containers:
+        - name: {{ .Values.api.deployment.name }}
+          image: "{{ .Values.api.deployment.image.name }}:{{ .Values.api.deployment.image.tag }}"
+          imagePullPolicy: {{ .Values.api.deployment.image.pullPolicy }}
+          args: ["run"]
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.api.config.name }}
+                  key: asp-environment
+
+            - name: CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.api.secret.name }}
+                  key: conn-str
+
+          resources:
+            {{- toYaml .Values.api.resources | nindent 12 }}
+
+          ports:
+            - containerPort: 8080
