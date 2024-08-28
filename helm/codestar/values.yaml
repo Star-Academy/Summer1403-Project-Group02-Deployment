@@ -27,7 +27,7 @@ ingress:
   ingressClassName: nginx
   name: codestar-ingress
   rules:
-    - host: codestar-g2.abriment.com
+    - host: codestar-g2-api.abriment.com
       path: /
       pathType: Prefix
       serviceName: codestar-api

@@ -5,8 +5,7 @@ metadata:
   labels:
     app: {{ .Values.ingress.name }}
     app.kubernetes.io/instance: {{ .Values.ingress.name }}
-  # finalizers:
-  #   - finalizers.abriment.dev/IngressDNSController
+
 spec:
   ingressClassName: {{ .Values.ingress.ingressClassName }}
   rules:
