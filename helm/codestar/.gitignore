@@ -1,2 +1,2 @@
-!templates/**/secret.yaml
-!templetes/**/secrets.yaml
+!templates/**/*secret.yaml
+!templetes/**/*secrets.yaml
