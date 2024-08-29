@@ -6,15 +6,15 @@ api:
     image:
       name: ghcr.io/star-academy/summer1403-project-group02-backend
       pullPolicy: IfNotPresent
-      tag: 0.4.0
+      tag: 0.8.1
 
     resources:
       limits:
-        cpu: 256m
-        memory: 256Mi
+        cpu: 2
+        memory: 4Gi
       requests:
-        cpu: 128m
-        memory: 128Mi
+        cpu: 1
+        memory: 2Gi
 
     pullSecret:
       enabled: false
