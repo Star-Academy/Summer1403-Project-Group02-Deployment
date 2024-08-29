@@ -1,12 +1,13 @@
+{{ $config := .Values.frontend.config }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ .Values.frontend.config.name }}
+  name: {{ $config.name }}
 
 data:
     nginx.conf: |
         pid /run/nginx.pid;
-        worker_processes {{ .Values.frontend.config.nginx.worker_processes }};
+        worker_processes {{ $config.nginx.worker_processes }};
         worker_rlimit_nofile 65535;
 
         events {

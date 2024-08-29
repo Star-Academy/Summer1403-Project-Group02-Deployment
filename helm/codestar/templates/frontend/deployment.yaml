@@ -1,38 +1,40 @@
+{{ $app := .Values.frontend }}
+{{ $deployment := .Values.frontend.deployment }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.frontend.deployment.name }}
+  name: {{ $deployment.name }}
   labels:
-    app: {{ .Values.frontend.deployment.name }}
+    app: {{ $deployment.name }}
 
 spec:
   selector:
     matchLabels:
-      app: {{ .Values.frontend.deployment.name }}
+      app: {{ $deployment.name }}
 
-  replicas: {{ default 1 .Values.frontend.deployment.replicaCount }}
+  replicas: {{ default 1 $deployment.replicaCount }}
 
   template:
     metadata:
       labels:
-        app: {{ .Values.frontend.deployment.name }}
+        app: {{ $deployment.name }}
 
     spec:
-      {{- if .Values.frontend.pullSecret.enabled }}
+      {{- if $deployment.pullSecret.enabled }}
       imagePullSecrets:
-        - name: {{ .Values.frontend.pullSecret.name }}
+        - name: {{ $deployment.pullSecret.name }}
       {{- end }}
 
       containers:
-        - name: {{ .Values.frontend.deployment.name }}
-          image: "{{ .Values.frontend.deployment.image.name }}:{{ .Values.frontend.deployment.image.tag }}"
+        - name: {{ $deployment.name }}
+          image: "{{ $deployment.image.name }}:{{ $deployment.image.tag }}"
           imagePullPolicy: IfNotPresent
 
           ports:
-            - containerPort: {{ .Values.frontend.deployment.containerPort }}
+            - containerPort: {{ $deployment.containerPort }}
 
           resources:
-            {{- toYaml .Values.frontend.deployment.resources | nindent 12 }}
+            {{- toYaml $deployment.resources | nindent 12 }}
 
           volumeMounts:
             - name: nginx-config
@@ -42,7 +44,7 @@ spec:
       volumes:
         - name: nginx-config
           configMap:
-            name: {{ .Values.frontend.config.name }}
+            name: {{ $app.config.name }}
             items:
               - key: nginx.conf
                 path: nginx.conf

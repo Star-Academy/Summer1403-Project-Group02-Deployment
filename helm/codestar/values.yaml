@@ -16,6 +16,9 @@ api:
         cpu: 128m
         memory: 128Mi
 
+    pullSecret:
+      enabled: false
+
   config:
     name: codestar-api-config
     asp_environment: Development
@@ -50,6 +53,9 @@ frontend:
       requests:
         cpu: 200m
         memory: 400Mi
+
+    pullSecret:
+      enabled: false
 
   service:
     name: codestar-frontend

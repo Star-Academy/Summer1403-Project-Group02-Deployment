@@ -1,66 +1,70 @@
+{{ $app := .Values.api }}
+{{ $deployment := $app.deployment }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.api.deployment.name }}
+  name: {{ $deployment.name }}
+  labels:
+    app: {{ $deployment.name }}
 
 spec:
-  replicas: {{ .Values.api.deployment.replicaCount }}
+  replicas: {{ $deployment.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Values.api.deployment.name }}
+      app: {{ $deployment.name }}
 
   template:
     metadata:
       labels:
-        app: {{ .Values.api.deployment.name }}
+        app: {{ $deployment.name }}
 
     spec:
-      {{- if .Values.api.pullSecret.enabled }}
+      {{- if $deployment.pullSecret.enabled }}
       imagePullSecrets:
-        - name: {{ .Values.api.pullSecret.name }}
+        - name: {{ $deployment.pullSecret.name }}
       {{- end }}
 
       initContainers:
-        - name: {{ .Values.api.deployment.name }}-init
-          image: "{{ .Values.api.deployment.image.name }}:{{ .Values.api.deployment.image.tag }}"
-          imagePullPolicy: {{ .Values.api.deployment.image.pullPolicy }}
+        - name: {{ $deployment.name }}-init
+          image: "{{ $deployment.image.name }}:{{ $deployment.image.tag }}"
+          imagePullPolicy: {{ $deployment.image.pullPolicy }}
           args: ["migrate"]
           env:
             - name: ASPNETCORE_ENVIRONMENT
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.api.config.name }}
+                  name: {{ $app.config.name }}
                   key: asp-environment
 
             - name: CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.api.secret.name }}
+                  name: {{ $app.secret.name }}
                   key: conn-str
 
           resources:
-            {{- toYaml .Values.api.deployment.resources | nindent 12 }}
+            {{- toYaml $deployment.resources | nindent 12 }}
 
       containers:
-        - name: {{ .Values.api.deployment.name }}
-          image: "{{ .Values.api.deployment.image.name }}:{{ .Values.api.deployment.image.tag }}"
-          imagePullPolicy: {{ .Values.api.deployment.image.pullPolicy }}
+        - name: {{ $deployment.name }}
+          image: "{{ $deployment.image.name }}:{{ $deployment.image.tag }}"
+          imagePullPolicy: {{ $deployment.image.pullPolicy }}
           args: ["run"]
           env:
             - name: ASPNETCORE_ENVIRONMENT
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.api.config.name }}
+                  name: {{ $app.config.name }}
                   key: asp-environment
 
             - name: CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.api.secret.name }}
+                  name: {{ $app.secret.name }}
                   key: conn-str
 
           resources:
-            {{- toYaml .Values.api.deployment.resources | nindent 12 }}
+            {{- toYaml $deployment.resources | nindent 12 }}
 
           ports:
-            - containerPort: {{ .Values.api.deployment.containerPort }}
+            - containerPort: {{ $deployment.containerPort }}

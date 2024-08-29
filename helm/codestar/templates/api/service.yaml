@@ -1,14 +1,15 @@
+{{ $app := .Values.api }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.api.service.name }}
+  name: {{ $app.service.name }}
   labels:
-    app: {{ .Values.api.service.name }}
+    app: {{ $app.service.name }}
 
 spec:
   selector:
-    app: {{ .Values.api.deployment.name }}
+    app: {{ $app.deployment.name }}
 
   ports:
-    - port: {{ .Values.api.service.port }}
-      targetPort: {{ .Values.api.deployment.containerPort }}
+    - port: {{ $app.service.port }}
+      targetPort: {{ $app.deployment.containerPort }}

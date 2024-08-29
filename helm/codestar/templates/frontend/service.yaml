@@ -1,13 +1,14 @@
+{{ $app := .Values.frontend }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.frontend.service.name }}
+  name: {{ $app.service.name }}
   labels:
-    app: {{ .Values.frontend.service.name }}
+    app: {{ $app.service.name }}
 spec:
   ports:
-    - port: {{ .Values.frontend.service.port }}
-      targetPort: {{ .Values.frontend.deployment.containerPort }}
+    - port: {{ $app.service.port }}
+      targetPort: {{ $app.deployment.containerPort }}
 
   selector:
-    app: {{ .Values.frontend.deployment.name }}
+    app: {{ $app.deployment.name }}
