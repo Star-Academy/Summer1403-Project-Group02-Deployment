@@ -1,0 +1,70 @@
+{{ $app := .Values.api }}
+{{ $deployment := $app.deployment }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $deployment.name }}
+  labels:
+    app: {{ $deployment.name }}
+
+spec:
+  replicas: {{ $deployment.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ $deployment.name }}
+
+  template:
+    metadata:
+      labels:
+        app: {{ $deployment.name }}
+
+    spec:
+      {{- if $deployment.pullSecret.enabled }}
+      imagePullSecrets:
+        - name: {{ $deployment.pullSecret.name }}
+      {{- end }}
+
+      initContainers:
+        - name: {{ $deployment.name }}-init
+          image: "{{ $deployment.image.name }}:{{ $deployment.image.tag }}"
+          imagePullPolicy: {{ $deployment.image.pullPolicy }}
+          args: ["migrate"]
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $app.config.name }}
+                  key: asp-environment
+
+            - name: CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $app.secret.name }}
+                  key: conn-str
+
+          resources:
+            {{- toYaml $deployment.resources | nindent 12 }}
+
+      containers:
+        - name: {{ $deployment.name }}
+          image: "{{ $deployment.image.name }}:{{ $deployment.image.tag }}"
+          imagePullPolicy: {{ $deployment.image.pullPolicy }}
+          args: ["run"]
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $app.config.name }}
+                  key: asp-environment
+
+            - name: CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $app.secret.name }}
+                  key: conn-str
+
+          resources:
+            {{- toYaml $deployment.resources | nindent 12 }}
+
+          ports:
+            - containerPort: {{ $deployment.containerPort }}

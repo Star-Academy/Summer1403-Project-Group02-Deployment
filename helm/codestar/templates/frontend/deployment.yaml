@@ -1,0 +1,50 @@
+{{ $app := .Values.frontend }}
+{{ $deployment := .Values.frontend.deployment }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $deployment.name }}
+  labels:
+    app: {{ $deployment.name }}
+
+spec:
+  selector:
+    matchLabels:
+      app: {{ $deployment.name }}
+
+  replicas: {{ default 1 $deployment.replicaCount }}
+
+  template:
+    metadata:
+      labels:
+        app: {{ $deployment.name }}
+
+    spec:
+      {{- if $deployment.pullSecret.enabled }}
+      imagePullSecrets:
+        - name: {{ $deployment.pullSecret.name }}
+      {{- end }}
+
+      containers:
+        - name: {{ $deployment.name }}
+          image: "{{ $deployment.image.name }}:{{ $deployment.image.tag }}"
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: {{ $deployment.containerPort }}
+
+          resources:
+            {{- toYaml $deployment.resources | nindent 12 }}
+
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ $app.config.name }}
+            items:
+              - key: nginx.conf
+                path: nginx.conf
