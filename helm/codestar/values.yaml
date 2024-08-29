@@ -2,6 +2,7 @@ api:
   deployment:
     name: codestar-api
     replicaCount: 2
+    containerPort: 8080
     image:
       name: ghcr.io/star-academy/summer1403-project-group02-backend
       pullPolicy: IfNotPresent
@@ -23,12 +24,47 @@ api:
     name: codestar-api
     port: 80
 
-ingress:
-  ingressClassName: nginx
-  name: codestar-ingress
-  rules:
-    - host: codestar-g2-api.abriment.com
-      path: /
-      pathType: Prefix
-      serviceName: codestar-api
-      servicePort: 80
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    name: codestar-api-ingress
+    rules:
+      - host: codestar-g2-api.abriment.com
+        path: /
+        pathType: Prefix
+
+frontend:
+  deployment:
+    name: codestar-frontend
+    replicaCount: 2
+    containerPort: 80
+    image:
+      name: ghcr.io/star-academy/summer1403-project-group02-frontend
+      pullPolicy: IfNotPresent
+      tag: 0.3.0
+
+    resources:
+      limits:
+        cpu: 400m
+        memory: 800Mi
+      requests:
+        cpu: 200m
+        memory: 400Mi
+
+  service:
+    name: codestar-frontend
+    port: 80
+
+  config:
+    name: codestar-frontend-config
+    nginx:
+      worker_processes: 1
+
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    name: codestar-frontend-ingress
+    rules:
+      - host: codestar-g2.abriment.com
+        path: /
+        pathType: Prefix

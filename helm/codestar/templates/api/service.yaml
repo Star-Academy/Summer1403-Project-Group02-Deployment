@@ -8,6 +8,7 @@ metadata:
 spec:
   selector:
     app: {{ .Values.api.deployment.name }}
+
   ports:
     - port: {{ .Values.api.service.port }}
-      targetPort: 8080
+      targetPort: {{ .Values.api.deployment.containerPort }}

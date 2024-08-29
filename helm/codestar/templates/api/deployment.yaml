@@ -63,4 +63,4 @@ spec:
             {{- toYaml .Values.api.deployment.resources | nindent 12 }}
 
           ports:
-            - containerPort: 8080
+            - containerPort: {{ .Values.api.deployment.containerPort }}

@@ -1,0 +1,29 @@
+
+{{ $ingress := .Values.api.ingress }}
+{{ $service := .Values.api.service }}
+
+{{- if $ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $ingress.name }}
+  labels:
+    app: {{ $ingress.name }}
+    app.kubernetes.io/instance: {{ $ingress.name }}
+
+spec:
+  ingressClassName: {{ $ingress.ingressClassName }}
+  rules:
+    {{- range $ingress.rules }}
+    - host: {{ .host }}
+      http:
+        paths:
+          - pathType: {{ default "Prefix" .pathType }}
+            path: {{ default "/" .path }}
+            backend:
+              service:
+                name: {{ $service.name }}
+                port:
+                  number: {{ $service.port }}
+    {{- end }}
+{{- end }}
