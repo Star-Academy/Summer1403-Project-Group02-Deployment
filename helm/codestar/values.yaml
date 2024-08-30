@@ -6,7 +6,7 @@ api:
     image:
       name: ghcr.io/star-academy/summer1403-project-group02-backend
       pullPolicy: IfNotPresent
-      tag: 0.8.1
+      tag: 0.8.2
 
     resources:
       limits:
