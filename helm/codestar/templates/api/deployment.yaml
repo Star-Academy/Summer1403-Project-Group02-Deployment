@@ -19,7 +19,7 @@ spec:
         app: {{ $deployment.name }}
 
     spec:
-      {{- if $deployment.pullSecret.enabled }}
+      {{- if $deployment.pullSecret.name }}
       imagePullSecrets:
         - name: {{ $deployment.pullSecret.name }}
       {{- end }}

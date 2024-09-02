@@ -10,14 +10,19 @@ api:
 
     resources:
       limits:
-        cpu: 2
+        cpu: "2"
         memory: 4Gi
       requests:
-        cpu: 1
+        cpu: "1"
         memory: 2Gi
 
     pullSecret:
       enabled: false
+      name: api-ghcr-secret
+
+  secret:
+    enabled: false
+    name: api-secret
 
   config:
     name: codestar-api-config
@@ -56,6 +61,7 @@ frontend:
 
     pullSecret:
       enabled: false
+      name: frontend-ghcr-secret
 
   service:
     name: codestar-frontend
