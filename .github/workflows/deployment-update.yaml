@@ -18,7 +18,7 @@ jobs:
   set-deployment-version:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
 
     env:
