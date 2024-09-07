@@ -6,8 +6,7 @@ api:
     image:
       name: ghcr.io/star-academy/summer1403-project-group02-backend
       pullPolicy: IfNotPresent
-      tag: 0.9.0
-
+      tag: 0.9.1
     resources:
       limits:
         cpu: "2"
@@ -15,23 +14,18 @@ api:
       requests:
         cpu: "1"
         memory: 2Gi
-
     pullSecret:
       enabled: false
       name: api-ghcr-secret
-
   secret:
     enabled: false
     name: api-secret
-
   config:
     name: codestar-api-config
     asp_environment: Development
-
   service:
     name: codestar-api
     port: 80
-
   ingress:
     enabled: true
     ingressClassName: nginx
@@ -40,7 +34,6 @@ api:
       - host: codestar-g2-api.abriment.com
         path: /
         pathType: Prefix
-
 frontend:
   deployment:
     name: codestar-frontend
@@ -50,7 +43,6 @@ frontend:
       name: ghcr.io/star-academy/summer1403-project-group02-frontend
       pullPolicy: IfNotPresent
       tag: 0.3.0
-
     resources:
       limits:
         cpu: 400m
@@ -58,20 +50,16 @@ frontend:
       requests:
         cpu: 200m
         memory: 400Mi
-
     pullSecret:
       enabled: false
       name: frontend-ghcr-secret
-
   service:
     name: codestar-frontend
     port: 80
-
   config:
     name: codestar-frontend-config
     nginx:
       worker_processes: 1
-
   ingress:
     enabled: true
     ingressClassName: nginx
