@@ -1,0 +1,62 @@
+name: Set deployment version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to deploy"
+        required: true
+      deployment:
+        description: "Deployment to update"
+        required: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.deployment }}-${{ inputs.version }}
+  cancel-in-progress: true
+
+jobs:
+  set-deployment-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    env:
+      VALUES_FILE: "helm/codestar/values.yaml"
+      DEPLOYMENT_TAG_KEY: ".${{ inputs.deployment }}.deployment.image.tag"
+      TAG: ${{ inputs.version }}
+      BRANCH: deployment-update-${{ inputs.deployment }}-${{ inputs.version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set deployment version
+        id: set_version
+        uses: mikefarah/yq@v4
+        with:
+          cmd: |
+            old_tag="$(yq e "${{ env.DEPLOYMENT_TAG_KEY }}" "${{ env.VALUES_FILE }}")"
+            yq e -i '${{ env.DEPLOYMENT_TAG_KEY }} = "${{ env.TAG }}"' ${{ env.VALUES_FILE }}
+  
+            echo "Updated deployment version from $old_tag to ${{ env.TAG }}"
+            echo "old_tag=$old_tag" >> $GITHUB_OUTPUT
+            echo "new_tag=${{ env.TAG }}" >> $GITHUB_OUTPUT
+
+      - name: Create pull request
+        id: create_pr
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Update deployment version of ${{ inputs.deployment }} to ${{ inputs.version }}"
+          title: "Update deployment version of ${{ inputs.deployment }} to ${{ inputs.version }}"
+          body: "This PR updates the deployment version of ${{ inputs.deployment }} to ${{ inputs.version }}, please review and merge."
+          branch: ${{ env.BRANCH }}
+          base: main
+          labels: "deployment-update"
+
+      - name: Display pull request information
+        if: ${{ steps.create_pr.outputs.pull-request-number }}
+        run: |
+          echo "Pull Request Number - ${{ steps.create_pr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.create_pr.outputs.pull-request-url }}"
