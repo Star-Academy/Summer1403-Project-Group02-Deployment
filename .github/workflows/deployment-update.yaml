@@ -66,24 +66,49 @@ jobs:
         run: |
           old_tag_major=$(echo ${{ steps.set_version.outputs.old_tag }} | cut -d '.' -f 1)
           new_tag_major=$(echo ${{ steps.set_version.outputs.new_tag }} | cut -d '.' -f 1)
-          if [ $old_tag_major -ne $new_tag_major ]; then
+          if [ "$old_tag_major" -ne "$new_tag_major" ]; then
             echo "Major bump detected"
-            echo "MAJOR_BUMP=true" >> $GITHUB_ENV
+            echo "major_bump=true" >> $GITHUB_OUTPUT
           else
             echo "No major bump detected"
-            echo "MAJOR_BUMP=false" >> $GITHUB_ENV
+            echo "major_bump=false" >> $GITHUB_OUTPUT
           fi
       
       - name: Accept pull request if no major bump
-        if: ${{ env.MAJOR_BUMP }} == 'false'
+        if: ${{ steps.determine_bump.outputs.major_bump == 'false' }}
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
             const prNumber = ${{ steps.create_pr.outputs.pull-request-number }};
-            await github.pulls.merge({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber,
-              merge_method: 'squash'
+
+            const pullRequest = await github.rest.pulls.get({
+              owner: owner,
+              repo: repo,
+              pull_number: prNumber
             });
+            const prBranch = pullRequest.data.head.ref;
+
+            if (pullRequest.data.state === 'open') {
+              // Merge the pull request
+              await github.rest.pulls.merge({
+                owner: owner,
+                repo: repo,
+                pull_number: prNumber,
+                merge_method: 'squash'
+              });
+
+              // Delete the branch
+              await github.rest.git.deleteRef({
+                owner: owner,
+                repo: repo,
+                ref: `heads/${prBranch}`
+              });
+
+              console.log(`Pull request ${prNumber} merged successfully`);
+            }
+            else {
+              console.log(`Pull request ${prNumber} is not open`);
+            }
