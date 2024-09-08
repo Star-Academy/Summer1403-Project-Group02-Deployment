@@ -42,7 +42,7 @@ frontend:
     image:
       name: ghcr.io/star-academy/summer1403-project-group02-frontend
       pullPolicy: IfNotPresent
-      tag: 0.4.3
+      tag: 0.4.6
     resources:
       limits:
         cpu: 400m
