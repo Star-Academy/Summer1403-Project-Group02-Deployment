@@ -22,7 +22,7 @@ api:
     name: api-secret
   config:
     name: codestar-api-config
-    asp_environment: Development
+    asp_environment: Release
   service:
     name: codestar-api
     port: 80
